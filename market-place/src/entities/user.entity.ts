@@ -46,15 +46,3 @@ export class User{
     @OneToMany(() => UserQuestion, userQuestion => userQuestion.user)
     userQuestions: UserQuestion[];
 }
-
-export interface UserWithoutPassword {
-    id: number;
-    username: string;
-    email: string;
-    phonenumber: string;
-    dob: Date;
-    gender: string;
-    type: string;
-    status: string;
-    userQuestions: UserQuestion[];
-  }

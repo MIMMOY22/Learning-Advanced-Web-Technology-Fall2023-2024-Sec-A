@@ -3,7 +3,7 @@ import { IsString,IsEmail,IsPhoneNumber,IsISO8601,MinLength,MaxLength,
 
 
 
-export class CreateUserDto {
+export class CreateAuthrDto {
 
 @IsString({message: 'Username must be string!'})
 @IsNotEmpty({message: 'Fill the Username'})
@@ -32,17 +32,12 @@ gender: string;
 @IsString()
 @MinLength(4,{message:'Minimum length 4'})
 @MaxLength(10,{message:'Maximum length 10'})
-// @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak'})
 @Matches(/[A-Za-z0-9@#$%&!]{8,10}/,{message:'invalid Password!'})
 password: string;
 
 @IsString()
 @MinLength(4,{message:'Minimum length 4'})
 @MaxLength(10,{message:'Maximum length 10'})
-// @Matches(/[A-Za-z0-9@#$%&!]{8,10}/, { message: 'Passwords do not match', context: { passwordField: 'password' } })
-// @Transform(({ value }) => value.toLowerCase()) 
-//@Equals('password', { message: 'Passwords do not match' })
-// @Matches('password')
 confirmpassword: string;
 
 @IsString()
