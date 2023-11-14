@@ -5,8 +5,9 @@ import { Repository } from 'typeorm';
 import { CreateAuthrDto } from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-//import { CreateUserDto } from './dto/create-user.dto';
-//import { UpdateUserDto } from './dto/update-user.dto';
+import { EditProfileDto } from './dto/editprofile.dto';
+
+
 
 
 @Injectable()
@@ -26,77 +27,56 @@ export class AuthService {
       throw new ConflictException('Username, email, or phone number is already taken');
     }
 
-    const user = this.userRepo.create(createAuthDto);
+    // const user = this.userRepo.create(createAuthDto);
+    const user = this.userRepo.create({
+      ...createAuthDto,
+      identifier: createAuthDto.username, // Use username as the identifier, adjust as needed
+    });
     return await this.userRepo.save(user);
   }
 
 
   async signin(logindto:LoginDto){
    const au = await this.userRepo.findOneBy({username:logindto.username});
-   const result = await bcrypt.compare(logindto.password,au.password)
-    if(result){
-      return true;
-    }
-    else{
-      return false;
-    }
-    }
+   if (!au) {
+    return 'User not found';  
   }
-//  async findAll() {
-//     return await this.userRepo.find();
-//   }
+  const result = await bcrypt.compare(logindto.password, au.password);
 
-//   async findOne(id: number) {
-//     return await this.userRepo.findOne({where: {id:id}});
-    
-//   }
- 
+  if (result && (au.type === 'admin' )) {
+    return 'Login successful for admin';
+  }
+  if (result && ( au.type === 'user')) {
+    return 'Login successful for  user'; 
+  }
 
-//  async update(id: number, updateUserDto: UpdateUserDto) {
-//      await this.userRepo.update(id,updateUserDto);
-//      return  `The information of this #${id} has been updated`
-//     }
-
-  // async delete(id: number) {
-  //     await this.userRepo.delete(id);
-  //     return`The user of ID: #${id} has been removed`;
-  // }
-
-  // async blockUser(id: number) {
-  //   const user = await this.userRepo.findOne({where: {id:id}});
-  
-  //   if (!user) {
-  //     throw new NotFoundException(`User with ID ${id} not found`);
-  //   }
-
-  //   await this.userRepo.update(id, { status: 'blocked' });
-  //   return `The user of ID: #${id} has been blocked`;
-  // }
-
-  // async countTotalUsers() {
-  //   return await this.userRepo.count();
-    
-  // }
-
-  // async countBlockedUsers() {
-  //   return  await this.userRepo.count({ where: { status: 'blocked' } });
-  // }
-
-  // async countActiveUsers() {
-  //   return await this.userRepo.count({ where: { status: 'active' } });
-  // }
-
-  // async findBlockedUsers() {
-  //   return await this.userRepo.find({ where: { status: 'blocked' } });
-  // }
-
-  // async findActiveUsers() {
-  //   return await this.userRepo.find({ where: { status: 'active' } });
-  // }
+  return 'Login failed'; 
+}
 
 
-  // async findByUsername(username: string): Promise<User | undefined> {
-  //   return this.userRepo.findOne({ where: { username } });
-  // }
+async getUserProfile(username: string) {
+  return await this.userRepo.findOne({ where:{username:username} }); // or use your own logic to retrieve the user profile
+}
 
+async editUserProfile(username: string, editProfileDto: EditProfileDto) {
+  const user = await this.userRepo.findOne({ where: { username } });
 
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  // Update user properties based on editProfileDto
+  if (editProfileDto.password) {
+    user.password = await bcrypt.hash(editProfileDto.password, 10);
+  }
+
+  // Update other properties from editProfileDto
+  user.username = editProfileDto.username;
+  user.email = editProfileDto.email;
+  user.phonenumber = editProfileDto.phonenumber;
+  user.dob = editProfileDto.dob;
+  user.gender = editProfileDto.gender;
+
+  return await this.userRepo.save(user);
+}
+  }

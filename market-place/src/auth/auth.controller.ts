@@ -4,6 +4,7 @@ import { CreateAuthrDto } from './dto/signup.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard} from './auth.guard'
+import { EditProfileDto } from './dto/editprofile.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,76 +25,43 @@ export class AuthController {
   }
 
   @Post('login')
-  @UsePipes(ValidationPipe)
-  async signin(@Body() logindto: LoginDto,@Session() session)
+@UsePipes(ValidationPipe)
+async signin(@Body() logindto: LoginDto, @Session() session) {
+  const isAuthenticated = await this.authService.signin(logindto);
+
+  if (isAuthenticated) {
+    session.username = logindto.username; // Set the session username 
+    return 'successfully logged in';
+  } else {
+    throw new HttpException('login failed', HttpStatus.UNAUTHORIZED);
+  }
+}
+
+
+  @Get('signout')
+  signout(@Session() session)
   {
-    const res = (await this.authService.signin(logindto));
-    if(await this.authService.signin(logindto)){
-      session.email = logindto.username;
-      return 'successfully logged in';
+    if (session.destroy()){
+      return {message:'Logged out'}
     }
     else{
-      throw new HttpException('login failed',HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('invalid action!');
     }
   }
 
-
-  //@Get('signout')
-
-  // @Get('findall')
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get('find/:id')
-  // findOne(@Param('id') id: number) {
-  //   return this.userManagementService.findOne(id);
-  // }
-
-  // @Put('update/:id')
-  // @UsePipes(ValidationPipe)
-  // update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userManagementService.update(id, updateUserDto);
-  // }
-
-  // @Delete('delete/:id')
-  // delete(@Param('id') id: number) {
-  //   return this.userManagementService.delete(id);
-  // }
-
-  // @Post('block/:id')
-  // blockUser(@Param('id') id: number) {
-  //   return this.userManagementService.blockUser(id);
-  // }
-
-  // @Get('count/totalusers')
-  // async countTotalUsers() {
-  //   const totalUsers = await this.userManagementService.countTotalUsers();
-  //   return `The total  users are: ${totalUsers}`;
-  // }
-
-  // @Get('count/blockedusers')
-  // async countBlockedUsers() {
-  //   const blockedUsers = await this.userManagementService.countBlockedUsers();
-  //   return ` Number of blocked users are: ${blockedUsers}`;
-  // }
-
-  // @Get('count/activeusers')
-  // async countActiveUsers() {
-  //   const activeUsers = await this.userManagementService.countActiveUsers();
-  //   return ` Active users are: ${activeUsers}`;
-  // }
-
-  // @Get('blockeduserinfo')
-  // async findBlockedUsers() {
-  //   const blockedUsers = await this.userManagementService.findBlockedUsers();
-  //   return blockedUsers;
-  // }
-
-  // @Get('activeuserinfo')
-  // async findActiveUsers() {
-  //   const activeUsers = await this.userManagementService.findActiveUsers();
-  //   return activeUsers;
-  // }
+@Get('profile')
+@UseGuards(AuthGuard)
+async getProfile(@Session() session) {
+  const user = await this.authService.getUserProfile(session.username);
+  return { success: true, user };
 }
 
+
+@Put('profile/edit')
+@UseGuards(AuthGuard)
+@UsePipes(ValidationPipe)
+async editProfile(@Body() editProfileDto: EditProfileDto, @Session() session) {
+  const updatedUser = await this.authService.editUserProfile(session.username, editProfileDto);
+  return { success: true, user: updatedUser };
+}
+}

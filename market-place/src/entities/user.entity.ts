@@ -43,6 +43,17 @@ export class User{
         this.confirmpassword = await bcrypt.hash(this.confirmpassword, 10);
     }
 
+   
+
     @OneToMany(() => UserQuestion, userQuestion => userQuestion.user)
     userQuestions: UserQuestion[];
+
+    @Column({ unique: true, nullable: false })
+    identifier: string;
+
+    @BeforeInsert()
+     setIdentifier() {
+   // Set the identifier to the same value as the username before inserting into the database
+   this.identifier = this.username;
+ }
 }
