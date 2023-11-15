@@ -5,11 +5,15 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard} from './auth.guard'
 import { EditProfileDto } from './dto/editprofile.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/entities/user.entity';
+import { Repository } from 'typeorm';
+
 
 @Controller('auth')
 export class AuthController {
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>,private readonly authService: AuthService) {}
 
   @Post('signup')
   @UsePipes(ValidationPipe)
@@ -27,11 +31,13 @@ export class AuthController {
   @Post('login')
 @UsePipes(ValidationPipe)
 async signin(@Body() logindto: LoginDto, @Session() session) {
-  const isAuthenticated = await this.authService.signin(logindto);
-
-  if (isAuthenticated) {
+ // const isAuthenticated = await this.authService.signin(logindto);
+  const authenticationResult = await this.authService.signin(logindto,session);
+  if (authenticationResult.includes('successful')) {
     session.username = logindto.username; // Set the session username 
-    return 'successfully logged in';
+    session.type = logindto.type;
+
+     return   authenticationResult;
   } else {
     throw new HttpException('login failed', HttpStatus.UNAUTHORIZED);
   }

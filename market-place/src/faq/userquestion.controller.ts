@@ -1,18 +1,18 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UsePipes,ValidationPipe} from '@nestjs/common';
-
-import { CreateFaqDto } from './dto/create-faq.dto';
-import { UpdateFaqDto } from './dto/update-faq.dto';
+import { Controller, Get, Post, Body, Put, Param, Delete, UsePipes,ValidationPipe, UseGuards, Req, Session} from '@nestjs/common';
 import { UserquestionService } from './userquestion.service';
 import { CreateUserQuestionDto } from './dto/create-user-question.dto';
+import { AuthUserGuard } from 'src/auth/authuser.guard';
 
 @Controller('userquestion')
+@UseGuards(AuthUserGuard)
 export class UserquestionController {
   constructor(private readonly userquestionService: UserquestionService) {}
 
   @Post('create')
   @UsePipes(ValidationPipe)
-  create(@Body() createUserQuestionDto: CreateUserQuestionDto) {
-    return this.userquestionService.create( createUserQuestionDto);
+  create(@Body() createUserQuestionDto: CreateUserQuestionDto,@Session() session) {
+    const userId = session.userId; // Get user ID from the session
+    return this.userquestionService.create(createUserQuestionDto,userId);
   }
 
   @Get('seeall')

@@ -30,7 +30,7 @@ export class User{
     @Column({nullable:false})
     confirmpassword: string;
 
-    @Column({ nullable:false})
+    @Column({name: 'type',nullable:false})
     type: string;
 
     @Column({ default: 'active' })
@@ -46,7 +46,7 @@ export class User{
    
 
     @OneToMany(() => UserQuestion, userQuestion => userQuestion.user)
-    userQuestions: UserQuestion[];
+    questions: UserQuestion[];
 
     @Column({ unique: true, nullable: false })
     identifier: string;

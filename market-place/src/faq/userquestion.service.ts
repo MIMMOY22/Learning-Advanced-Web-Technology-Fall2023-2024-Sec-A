@@ -1,18 +1,24 @@
-import { Injectable,ConflictException } from '@nestjs/common';
+import { Injectable,ConflictException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { CreateUserQuestionDto } from './dto/create-user-question.dto';
 import { UserQuestion } from 'src/entities/userquestion.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserQuestionDto } from './dto/update-user-question.dto';
+import { User } from 'src/entities/user.entity';
+import { CreateUserDto } from 'src/user-management/dto/create-user.dto';
+import { request } from 'http';
+import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class UserquestionService {
 
-  constructor(@InjectRepository(UserQuestion) private readonly userquestionRepo: Repository<UserQuestion>){}
+  constructor(@InjectRepository(UserQuestion) private readonly userquestionRepo: Repository<UserQuestion>,
+              ){}
+           
 
-   async create(createUserQuestionDto: CreateUserQuestionDto) {
+   async create(createUserQuestionDto: CreateUserQuestionDto, id: number) {
     const existingQuestion = await this.userquestionRepo.findOne({
         where: [
-          { question: createUserQuestionDto.question },
+          { question: createUserQuestionDto.question }
           
         ],
       });
@@ -20,7 +26,10 @@ export class UserquestionService {
       if (existingQuestion) {
         throw new ConflictException('Question already answered');
       }
+      
     const uq = await this.userquestionRepo.create(createUserQuestionDto);
+    
+    
     return await this.userquestionRepo.save(uq);
   }
 
@@ -46,4 +55,10 @@ export class UserquestionService {
     return await this.userquestionRepo.count();
     
   }
+  // async getUserById(id: number) {
+  //   return await this.userRepo.findOne({where: {id:id},
+  //                                        relations:{questions:true}});
+ // }
+  
+
 }

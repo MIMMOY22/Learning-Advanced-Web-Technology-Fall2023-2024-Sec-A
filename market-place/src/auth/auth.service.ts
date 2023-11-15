@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException,ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException,ConflictException,Session, Param } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -36,21 +36,28 @@ export class AuthService {
   }
 
 
-  async signin(logindto:LoginDto){
-   const au = await this.userRepo.findOneBy({username:logindto.username});
-   if (!au) {
+  async signin(logindto:LoginDto,session: Record<string, any>){
+   const au = await this.userRepo.findOneBy({username: logindto.username,type: logindto.type});
+  
+      if (!au) {
     return 'User not found';  
   }
   const result = await bcrypt.compare(logindto.password, au.password);
-
-  if (result && (au.type === 'admin' )) {
-    return 'Login successful for admin';
-  }
-  if (result && ( au.type === 'user')) {
-    return 'Login successful for  user'; 
+  if (result)
+{
+    session.userId = au.id;
+    session.username = logindto.username;
+    session.type = logindto.type;
+    //console.log(session);
+    if (au.type === 'admin') {
+      return 'Admin login successful';
+    }
+     else if (au.type === 'user') {
+      return 'User login successful';
   }
 
   return 'Login failed'; 
+}
 }
 
 
@@ -60,6 +67,7 @@ async getUserProfile(username: string) {
 
 async editUserProfile(username: string, editProfileDto: EditProfileDto) {
   const user = await this.userRepo.findOne({ where: { username } });
+  
 
   if (!user) {
     throw new NotFoundException('User not found');
@@ -79,4 +87,9 @@ async editUserProfile(username: string, editProfileDto: EditProfileDto) {
 
   return await this.userRepo.save(user);
 }
+async getUserById(id: number) {
+  return await this.userRepo.findOne({where: {id:id},
+                                       relations:{questions:true}});
+}
+
   }

@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe,SetMetadata, UseGuards  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UsePipes, ValidationPipe,SetMetadata, UseGuards,Session
+  } from '@nestjs/common';
 import { UserManagementService } from './user-management.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthAdminGuard } from 'src/auth/authadmin.guard';
 
 
 
 @Controller('user-management')
+@UseGuards(AuthAdminGuard)
 
 export class UserManagementController {
 
@@ -14,7 +17,7 @@ export class UserManagementController {
   @Post('create')
   @UsePipes(ValidationPipe)
 
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto,@Session() session) {
     return this.userManagementService.create(createUserDto);
   }
 

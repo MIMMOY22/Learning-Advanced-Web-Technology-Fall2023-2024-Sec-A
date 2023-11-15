@@ -10,7 +10,7 @@ export class UserQuestion{
     @Column({ nullable:false})
     question: string;
 
-    @ManyToOne(() => User, user => user.userQuestions)
-    @JoinColumn({ name: 'user_id' })
+    @ManyToOne(() => User)
+    @JoinColumn({ name: "user_id" })
     user: User;
 }

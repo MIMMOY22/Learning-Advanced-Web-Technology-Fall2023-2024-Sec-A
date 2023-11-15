@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UsePipes,ValidationPipe} from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UsePipes,ValidationPipe, UseGuards} from '@nestjs/common';
 import { FaqService } from './faq.service';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
+import { AuthAdminGuard } from 'src/auth/authadmin.guard';
 
 @Controller('faq')
+@UseGuards(AuthAdminGuard)
 export class FaqController {
   constructor(private readonly faqService: FaqService) {}
 

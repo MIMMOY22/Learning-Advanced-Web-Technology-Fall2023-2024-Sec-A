@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, Matches, MaxLength, MinLength, IsOptional } from 'class-validator';
 
 export class LoginDto {
     @IsString({message: 'Username must be string!'})
@@ -9,5 +9,8 @@ export class LoginDto {
     @MaxLength(10,{message:'Maximum length 10'})
     @Matches(/[A-Za-z0-9@#$%&!]{8,10}/,{message:'invalid Password!'})
     password: string;
+
+    @IsString()
+    type: string;
 
 }
