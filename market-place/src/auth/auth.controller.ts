@@ -8,12 +8,18 @@ import { EditProfileDto } from './dto/editprofile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
+import { TemplateService } from 'src/faq/template.service';
+import { DownloadService } from 'src/faq/download.service';
+import { AuthUserGuard } from './authuser.guard';
 
 
 @Controller('auth')
 export class AuthController {
 
-  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>,private readonly authService: AuthService) {}
+  constructor(@InjectRepository(User) private readonly userRepo: Repository<User>,
+             private readonly authService: AuthService,
+             private readonly templateService: TemplateService, // Inject TemplateService
+             private readonly downloadService: DownloadService,) {} // Inject DownloadService
 
   @Post('signup')
   @UsePipes(ValidationPipe)
@@ -70,4 +76,25 @@ async editProfile(@Body() editProfileDto: EditProfileDto, @Session() session) {
   const updatedUser = await this.authService.editUserProfile(session.username, editProfileDto);
   return { success: true, user: updatedUser };
 }
+
+
+@Get('templates')
+  @UseGuards(AuthUserGuard,AuthGuard)
+  async getAllTemplates() {
+    return this.templateService.getAllTemplates();
+  }
+
+  @Post('download/:templateId')
+  @UseGuards(AuthUserGuard,AuthGuard)
+  async downloadTemplate(@Session() session, @Param('templateId') templateId: number) {
+    const userId = session.userId;
+    return this.downloadService.downloadTemplate(userId, templateId);
+  }
+
+  @Get('download/history')
+  @UseGuards(AuthUserGuard,AuthGuard)
+  async getDownloadHistory(@Session() session) {
+    const userId = session.userId;
+    return this.downloadService.getDownloadHistory(userId);
+  }
 }

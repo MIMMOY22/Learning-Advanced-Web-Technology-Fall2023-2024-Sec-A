@@ -1,6 +1,7 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn,OneToMany } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { UserQuestion } from "./userquestion.entity";
+import { Download } from "./download.entity";
 
 
 @Entity("users")
@@ -44,16 +45,19 @@ export class User{
     }
 
    
-
     @OneToMany(() => UserQuestion, userQuestion => userQuestion.user)
     questions: UserQuestion[];
 
     @Column({ unique: true, nullable: false })
     identifier: string;
 
+    @OneToMany(() => Download, download => download.user)
+    downloads: Download[];
+
     @BeforeInsert()
      setIdentifier() {
    // Set the identifier to the same value as the username before inserting into the database
-   this.identifier = this.username;
- }
+    this.identifier = this.username;
+    }
+
 }

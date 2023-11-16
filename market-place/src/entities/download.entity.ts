@@ -1,11 +1,17 @@
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
+import { Template } from './template.entity';
 
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity('templates')
-export class Template {
+@Entity('downloads')
+export class Download {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  description: string;
+  @ManyToOne(() => User, user => user.downloads)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @ManyToOne(() => Template, template => template.downloads)
+  @JoinColumn({ name: 'template_id' })
+  template: Template;
 }

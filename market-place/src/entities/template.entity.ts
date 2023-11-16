@@ -1,5 +1,5 @@
-
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Download } from './download.entity';
 
 @Entity('templates')
 export class Template {
@@ -8,4 +8,7 @@ export class Template {
 
   @Column()
   description: string;
+
+  @OneToMany(() => Download, download => download.template)
+  downloads: Download[];
 }
