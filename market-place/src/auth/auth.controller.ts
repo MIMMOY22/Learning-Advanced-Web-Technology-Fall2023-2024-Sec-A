@@ -8,9 +8,9 @@ import { EditProfileDto } from './dto/editprofile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
-import { TemplateService } from 'src/faq/template.service';
-import { DownloadService } from 'src/faq/download.service';
-import { AuthUserGuard } from './authuser.guard';
+import { TemplateService } from 'src/operations/template.service';
+import { DownloadService } from 'src/operations/download.service';
+  import { AuthUserGuard } from './authuser.guard';
 
 
 @Controller('auth')

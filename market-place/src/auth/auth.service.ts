@@ -87,9 +87,9 @@ async editUserProfile(username: string, editProfileDto: EditProfileDto) {
 
   return await this.userRepo.save(user);
 }
-async getUserById(id: number) {
-  return await this.userRepo.findOne({where: {id:id},
-                                       relations:{questions:true}});
-}
+// async getUserById(id: number) {
+//   return await this.userRepo.findOne({where: {id:id},
+//                                        relations:{questions:true}});
+// }
 
   }

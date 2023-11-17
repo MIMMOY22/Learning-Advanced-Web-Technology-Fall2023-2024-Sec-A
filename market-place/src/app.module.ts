@@ -4,8 +4,8 @@ import { AppService } from './app.service';
 import { UserManagementModule } from './user-management/user-management.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MiddlewareMiddleware } from './middleware/middleware.middleware';
-import { FaqModule } from './faq/faq.module';
-import { UserquestionModule } from './faq/userquestion.module';
+import { FaqModule } from './operations/faq.module';
+import { UserquestionModule } from './operations/userquestion.module';
 import { AuthModule } from './auth/auth.module';
 import config from 'ormconfig';
 @Module({
